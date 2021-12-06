@@ -7,7 +7,6 @@
 #include <string.h>
 
 void    readnumbers(int **, size_t *);
-int     readint(void);
 int     partone(int *, size_t, size_t);
 bool    isvalid(int *, size_t, int);
 int     parttwo(int *, size_t, int);
@@ -50,26 +49,20 @@ void readnumbers(int **numbers, size_t *len)
         *len = 0;
         size_t cap = 0;
 
-        int n;
-        while ((n = readint()) != INT_MIN) {
+        char buf[BUFSIZE];
+        while (fgets(buf, sizeof(buf), stdin) != NULL) {
+                if (buf[0] == '\0' || buf[0] == '\n')
+                        continue;
                 if (*len == cap) {
                         cap += cap / 2 + 10;
                         *numbers = xrealloc(*numbers, sizeof(**numbers) * cap);
                 }
-                (*numbers)[(*len)++] = n;
+                (*numbers)[(*len)++] = atoi(buf);
         }
-}
-
-int readint(void)
-{
-        char buf[BUFSIZE];
-        if (fgets(buf, sizeof(buf), stdin) == NULL) {
-                if (ferror(stdin))
-                        die("fgets: read error");
-                if (feof(stdin))
-                        return INT_MIN;
+        if (ferror(stdin)) {
+                free(*numbers);
+                die("fgets: read error");
         }
-        return atoi(buf);
 }
 
 int partone(int *numbers, size_t len, size_t prelen)
