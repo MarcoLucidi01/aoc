@@ -28,8 +28,9 @@ public class Day7
     public static int minimumAlignFuel(List<Integer> positions, Function<Integer, Integer> fuelCalculator)
     {
         int maxPos = Collections.max(positions);
+        int minPos = Collections.min(positions);
         int minFuel = Integer.MAX_VALUE;
-        for (int end = 0; end < maxPos; end++) {
+        for (int end = minPos; end <= maxPos; end++) {
             int fuel = 0;
             for (int start : positions)
                 fuel += fuelCalculator.apply(Math.abs(end - start));
