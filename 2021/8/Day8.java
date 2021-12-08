@@ -74,7 +74,6 @@ public class Day8
             clear();
             Arrays.sort(patterns, Comparator.comparingInt(String::length));
             for (String pattern : patterns) {
-                pattern = normalize(pattern);
                 switch (pattern.length()) {
                 case 2:
                     put(pattern, 1);
@@ -116,6 +115,7 @@ public class Day8
 
         private void put(String pattern, int digit)
         {
+            pattern = normalize(pattern);
             digitsTable.put(pattern, digit);
             patternsTable.put(digit, pattern);
         }
