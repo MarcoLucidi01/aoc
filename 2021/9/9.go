@@ -11,17 +11,17 @@ import (
 )
 
 func main() {
-	heatmap, err := readHeatmap()
+	hmap, err := readHeightmap()
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("part 1: %d\n", partOne(heatmap))
-	fmt.Printf("part 2: %d\n", partTwo(heatmap))
+	fmt.Printf("part 1: %d\n", partOne(hmap))
+	fmt.Printf("part 2: %d\n", partTwo(hmap))
 }
 
-func readHeatmap() ([][]int, error) {
+func readHeightmap() ([][]int, error) {
 	scanner := bufio.NewScanner(os.Stdin)
-	var heatmap [][]int
+	var hmap [][]int
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
 		if line == "" {
@@ -31,63 +31,63 @@ func readHeatmap() ([][]int, error) {
 		for _, r := range line {
 			row = append(row, int(r-'0'))
 		}
-		heatmap = append(heatmap, row)
+		hmap = append(hmap, row)
 	}
-	return heatmap, scanner.Err()
+	return hmap, scanner.Err()
 }
 
-func partOne(heatmap [][]int) int {
+func partOne(hmap [][]int) int {
 	risk := 0
-	for y := 0; y < len(heatmap); y++ {
-		for x := 0; x < len(heatmap[y]); x++ {
-			if isLowPoint(heatmap, x, y) {
-				risk += heatmap[y][x] + 1
+	for y := 0; y < len(hmap); y++ {
+		for x := 0; x < len(hmap[y]); x++ {
+			if isLowPoint(hmap, x, y) {
+				risk += hmap[y][x] + 1
 			}
 		}
 	}
 	return risk
 }
 
-func isLowPoint(heatmap [][]int, x, y int) bool {
-	switch h := heatmap[y][x]; {
-	case x-1 >= 0 && h >= heatmap[y][x-1]:
+func isLowPoint(hmap [][]int, x, y int) bool {
+	switch h := hmap[y][x]; {
+	case x-1 >= 0 && h >= hmap[y][x-1]:
 		return false
-	case x+1 < len(heatmap[y]) && h >= heatmap[y][x+1]:
+	case x+1 < len(hmap[y]) && h >= hmap[y][x+1]:
 		return false
-	case y-1 >= 0 && h >= heatmap[y-1][x]:
+	case y-1 >= 0 && h >= hmap[y-1][x]:
 		return false
-	case y+1 < len(heatmap) && h >= heatmap[y+1][x]:
+	case y+1 < len(hmap) && h >= hmap[y+1][x]:
 		return false
 	}
 	return true
 }
 
-func partTwo(heatmap [][]int) int {
-	var bSizes []int
-	seen := make(map[string]bool)
-	for y := 0; y < len(heatmap); y++ {
-		for x := 0; x < len(heatmap[y]); x++ {
-			if isLowPoint(heatmap, x, y) {
-				bSizes = append(bSizes, findBasinSize(heatmap, seen, x, y))
+type point struct {
+	x, y int
+}
+
+func partTwo(hmap [][]int) int {
+	var bsizes []int
+	seen := make(map[point]bool)
+	for y := 0; y < len(hmap); y++ {
+		for x := 0; x < len(hmap[y]); x++ {
+			if bsize := findBasinSize(hmap, seen, x, y); bsize > 0 {
+				bsizes = append(bsizes, bsize)
 			}
 		}
 	}
-	sort.Sort(sort.Reverse(sort.IntSlice(bSizes)))
-	return bSizes[0] * bSizes[1] * bSizes[2]
+	sort.Sort(sort.Reverse(sort.IntSlice(bsizes)))
+	return bsizes[0] * bsizes[1] * bsizes[2]
 }
 
-func findBasinSize(heatmap [][]int, seen map[string]bool, x, y int) int {
-	if seen[str(x, y)] || y < 0 || y >= len(heatmap) || x < 0 || x >= len(heatmap[y]) || heatmap[y][x] == 9 {
+func findBasinSize(hmap [][]int, seen map[point]bool, x, y int) int {
+	if y < 0 || y >= len(hmap) || x < 0 || x >= len(hmap[y]) || hmap[y][x] == 9 || seen[point{x, y}] {
 		return 0
 	}
-	seen[str(x, y)] = true
-	size := findBasinSize(heatmap, seen, x-1, y)
-	size += findBasinSize(heatmap, seen, x+1, y)
-	size += findBasinSize(heatmap, seen, x, y-1)
-	size += findBasinSize(heatmap, seen, x, y+1)
+	seen[point{x, y}] = true
+	size := findBasinSize(hmap, seen, x-1, y)
+	size += findBasinSize(hmap, seen, x+1, y)
+	size += findBasinSize(hmap, seen, x, y-1)
+	size += findBasinSize(hmap, seen, x, y+1)
 	return size + 1
-}
-
-func str(x, y int) string {
-	return fmt.Sprintf("%d,%d", x, y)
 }
