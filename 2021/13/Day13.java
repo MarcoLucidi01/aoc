@@ -65,19 +65,19 @@ public class Day13
 
     private static void printPaper(Set<Dot> dots)
     {
-        int w = maxPlusOne(dots, X);
-        int h = maxPlusOne(dots, Y);
+        int maxX = max(dots, X);
+        int maxY = max(dots, Y);
         Dot d = new Dot();
-        for (int y = 0; y < h; y++) {
-            for (int x = 0; x < w; x++)
+        for (int y = 0; y <= maxY; y++) {
+            for (int x = 0; x <= maxX; x++)
                 System.out.printf("%c", dots.contains(d.set(x, y)) ? '#' : '.');
             System.out.println();
         }
     }
 
-    private static int maxPlusOne(Set<Dot> dots, int a)
+    private static int max(Set<Dot> dots, int a)
     {
-        return 1 + dots
+        return dots
             .stream()
             .map(d -> a == X ? d.x : d.y)
             .max(Comparator.comparingInt(n -> n))
