@@ -21,7 +21,7 @@ const (
 	exEq
 )
 
-var toBinWord = map[byte]string{
+var hexToBin = map[byte]string{
 	'0': "0000",
 	'1': "0001",
 	'2': "0010",
@@ -69,13 +69,11 @@ func (b *bitsReader) readExpr() expr {
 	ex := expr{ver: b.readUint(3)}
 
 	if ex.typ = exType(b.readUint(3)); ex.typ == exLiteral {
-		for {
-			g := b.readUint(5)
-			ex.n = (ex.n << 4) | (g & 0b1111)
-			if g&0b10000 == 0 {
-				return ex
-			}
+		for goon := true; goon; {
+			goon = b.readBit() == 1
+			ex.n = (ex.n << 4) | b.readUint(4)
 		}
+		return ex
 	}
 
 	if b.readBit() == 1 { // length type ID
@@ -105,11 +103,11 @@ func (b *bitsReader) readBit() uint64 {
 	if b.i == len(b.word) {
 		hex, err := b.r.ReadByte()
 		if err != nil {
-			die(fmt.Sprintf("readBit: unexpected error %s", err))
+			die("readBit: unexpected error: %s", err)
 		}
 		var ok bool
-		if b.word, ok = toBinWord[hex]; !ok {
-			die(fmt.Sprintf("readBit: unexpected char %c", hex))
+		if b.word, ok = hexToBin[hex]; !ok {
+			die("readBit: unexpected byte %#v", hex)
 		}
 		b.i = 0
 	}
@@ -122,8 +120,9 @@ func (b *bitsReader) readBit() uint64 {
 	return bit
 }
 
-func die(err string) {
-	fmt.Fprintf(os.Stderr, "%s\n", err)
+func die(format string, a ...interface{}) {
+	fmt.Fprintf(os.Stderr, format, a...)
+	fmt.Fprintln(os.Stderr)
 	os.Exit(1)
 }
 
@@ -140,7 +139,7 @@ func eval(ex expr) uint64 {
 		return ex.n
 	}
 	if len(ex.sub) == 0 {
-		die(fmt.Sprintf("eval: expression %d has no sub-expressions", ex.typ))
+		die("eval: expression %d has no sub-expressions", ex.typ)
 	}
 	ret := eval(ex.sub[0])
 	for _, sub := range ex.sub[1:] {
@@ -176,7 +175,7 @@ func eval(ex expr) uint64 {
 				ret = 0
 			}
 		default:
-			die(fmt.Sprintf("eval: unknown expression type %d", ex.typ))
+			die("eval: unknown expression type %d", ex.typ)
 		}
 	}
 	return ret
