@@ -15,16 +15,14 @@ int main(void)
                 exit(EXIT_FAILURE);
         }
 
-        int px, py; /* probe position */
-        int vx, vy; /* probe velocity */
         int maxheight = 0;
         int ngood = 0;
-        for (int i = -N; i < N; i++) { /* stupid brute force */
+        for (int i = -N; i < N; i++) { /* stupid brute force, can easily be improved */
                 for (int j = -N; j < N; j++) {
-                        px = 0;
-                        py = 0;
-                        vx = i;
-                        vy = j;
+                        int px = 0; /* probe position */
+                        int py = 0;
+                        int vx = i; /* probe velocity */
+                        int vy = j;
                         int maxstepheight = 0;
                         while (px <= tx2 && py >= ty1) {
                                 if (px >= tx1 && py <= ty2) {
