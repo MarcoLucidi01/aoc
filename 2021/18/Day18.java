@@ -19,7 +19,7 @@ public class Day18
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()) {
             String n = scanner.nextLine();
-            if ( ! n.isEmpty())
+            if ( ! n.isBlank())
                 numbers.add(n);
         }
         return numbers;
