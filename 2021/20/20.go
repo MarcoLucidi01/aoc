@@ -14,8 +14,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("part 1: %d\n", countLit(enhanc(algo, image, 2)))
-	fmt.Printf("part 2: %d\n", countLit(enhanc(algo, image, 50)))
+	fmt.Printf("part 1: %d\n", countLit(enhance(algo, image, 2)))
+	fmt.Printf("part 2: %d\n", countLit(enhance(algo, image, 50)))
 }
 
 func readAlgoAndImage() ([]byte, [][]byte, error) {
@@ -55,14 +55,14 @@ func countLit(image [][]byte) int {
 	return cnt
 }
 
-func enhanc(algo []byte, image [][]byte, nsteps int) [][]byte {
+func enhance(algo []byte, image [][]byte, nsteps int) [][]byte {
 	for step := 0; step < nsteps; step++ {
-		image = enhancStep(algo, image, step)
+		image = enhanceStep(algo, image, step)
 	}
 	return image
 }
 
-func enhancStep(algo []byte, image [][]byte, step int) [][]byte {
+func enhanceStep(algo []byte, image [][]byte, step int) [][]byte {
 	w, h := len(image[0]), len(image)
 	var output [][]byte
 	for y := -1; y < h+1; y++ {
