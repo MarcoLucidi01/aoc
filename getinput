@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -u
+
+year="$(realpath . | awk -F '/' '{ printf "%d", $(NF-1) }')"
+day="$(realpath . | awk -F '/' '{ printf "%d", $NF }')"
+
+curl -s "https://adventofcode.com/$year/day/$day/input" -H "Cookie: session=$AOC_SESSION" --output "input"
