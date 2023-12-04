@@ -49,12 +49,7 @@ func readCards(r io.Reader) ([]int, error) {
 func part1(cards []int) int {
 	sum := 0
 	for _, m := range cards {
-		switch {
-		case m < 1:
-			continue
-		case m == 1:
-			sum++
-		default:
+		if m > 0 {
 			sum += 1 << (m - 1)
 		}
 	}
