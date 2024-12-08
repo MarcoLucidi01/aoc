@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -u
+
+year="$(realpath . | awk -F '/' '{ printf "%d", $(NF-1) }')"
+day="$(realpath . | awk -F '/' '{ printf "%d", $NF }')"
+
+curl -s "https://adventofcode.com/$year/day/$day" -H "Cookie: session=$AOC_SESSION" \
+ | awk '
+   !e && tolower($0) ~ /example/           { e=1; next }
+    e && tolower($0) ~ /^<pre><code>/      { p=1; n++; $0=substr($0, length("<pre><code>")+1) }
+    e && tolower($0) ~ /^<\/code><\/pre>$/ { e=0; p=0; next }
+    p                                      { print > "example" (n > 1 ? n : "") }
+'
